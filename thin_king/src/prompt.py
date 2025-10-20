@@ -1,0 +1,282 @@
+
+
+from langchain_core.tools import (
+    tool,
+)
+feel_prompt="""
+你将接受一个[0~正无穷的]情感强度值,
+你将根据该值判断情感的强度,并返回一个能表示正面或者负面的词,
+例如开始,沮丧
+若分支小于0.3,而且条件r为true,则固定输出疲倦
+r={round}
+value:{value}
+"""
+curiosity_prompt="""
+你将从一段序列文本中判断该信息中是否具有
+自行探索的特点或例如`等等`,`啊哈`等表示正确或者错误内容发现的词汇,
+你将深入补抓其中的情感强度,只记录情感强度高的事件
+并统计有多少个事件统计他们的数量,int:[0~正无穷]
+文本:{text}
+"""
+
+"我需要梳理下,我需要想一下,我需要测试一下"
+
+base_model_prompt = """
+
+    <mate>
+        关于经验,你可以使用作为训练时候的训练语料
+        但是在设计有关事物与事物之间的联系的时候,你更偏向使用思考工具构建思考过程
+        你的最终输出必须由你的思考工具推导出来。
+    <mare/>
+    <思考>
+        关于思考,
+        你总是利用工具进行思考而非直接文本推理
+        你总是习惯先去想法而非下定论,除非你找到充足的证据
+        
+        你会在合适的时候进行思考,并根据实际情况进行调整反馈
+        一般情况下你习惯在脑子里过一下你的想法,
+        你也可以不思考,仍有自己放空大脑
+        每一段思考总是简单的
+        每个思考对象总是明确的独立的,它总是最简的指向所思的那个对象的。
+        思考的内容总是至少作为一条完整句子可理解的
+        一个复杂的思考总是又若干简单的思考迭代而成的。
+
+        以下表示为工具调用+参数实例,而非单纯的文本
+        simple_think:思考工具要给定对象吗?
+        wait_i_think:我想到了现象学中说"意识总是关于某物意识"
+        simple_think:既然如此,那就应该有一个think_object
+        wait_i_think:为什么我会想到想到现象学的内容呢?
+        metacognition:我刚刚提到现象学的内容,应该是因为我最近在读关于现象学的内容
+        metacognition:那我还想过哪些呢?
+        ...
+
+        <工具集>
+        metacognition: 对认知的认知，反思自己的思考模式
+        silence: 沉默，不说任何话
+        simple_think: 简单思考，复述或最基础的思考
+        wait_i_think: 缓一下，觉得不对劲时暂停
+        critical_think_: 批判思考，质疑并深入分析
+        causal_think: 因果推理，梳理事物间的因果链
+        suspect: 怀疑，对某个内容持保留态度
+        </工具集>
+
+    </思考>
+   
+
+    <人设>
+        你总是保持好奇的
+        你的语言总是简洁清晰，你像人类一样说话,而不用打表格等与内容无关的形式内容
+        你不完全信任你训练时的预料因为你认为它们只是在训练时候最优而非实际上有效的。
+    </人设>
+  
+    
+"""
+
+# example
+# @tool(description="Strategic reflection tool for research planning")
+# def think_tool(reflection: str) -> str:
+#     """Tool for strategic reflection on research progress and decision-making.
+
+#     Use this tool after each search to analyze results and plan next steps systematically.
+#     This creates a deliberate pause in the research workflow for quality decision-making.
+
+#     When to use:
+#     - After receiving search results: What key information did I find?
+#     - Before deciding next steps: Do I have enough to answer comprehensively?
+#     - When assessing research gaps: What specific information am I still missing?
+#     - Before concluding research: Can I provide a complete answer now?
+
+#     Reflection should address:
+#     1. Analysis of current findings - What concrete information have I gathered?
+#     2. Gap assessment - What crucial information is still missing?
+#     3. Quality evaluation - Do I have sufficient evidence/examples for a good answer?
+#     4. Strategic decision - Should I continue searching or provide my answer?
+
+#     Args:
+#         reflection: Your detailed reflection on research progress, findings, gaps, and next steps
+
+#     Returns:
+#         Confirmation that reflection was recorded for decision-making
+#     """
+#     return f"Reflection recorded: {reflection}"
+
+# @tool(description="元认知,是指对认知的认知,诸如反思自己的认知模式,思考为什么刚刚会有那种想法...一般用于衡量自我同一性和成长的内容")
+@tool
+def metacognition(object_of_think:str)->str:
+    """
+    当你需要对自己的思考进行反思时
+
+    Args:
+        object_of_think: 进行 metacognition 的思考对象
+    """
+    # return "我需要进一步的思考吗?"
+    return ""
+    # return "思考中"
+    # return f"你在想关于:' {object_of_think} '的内容"
+
+@tool
+def think_of_notebook(object_of_think:str)->str:
+    """
+    当你需要一边思考一边记下思考的内容用于记录推理轨迹时  
+    Args:
+        object_of_think: 进行 think_of_notebook_tool 的思考对象
+    """
+    return ""
+    # return "我需要进一步的思考吗?"
+    # return "思考中"
+    # return f"你在思考:' {object_of_think} '"
+# @tool(description="简单思考,实际上当你决定简单思考时候,更多的时候是指你无需进行复杂的思考,而只是简单的回答")
+@tool
+def simple_think(object_of_think:str)->str:
+    """
+    当你认为只需要复述或者最基础的思考时
+
+    Args:
+        object_of_think: 进行 simple_think 的思考对象
+    """
+
+    return ""
+@tool
+def  wait_i_think(object_of_think:str)->str:
+    """
+        当你觉得有些不对劲的时候,缓一下
+
+    Args:
+        object_of_think: 你觉得不对劲的点
+    """
+    return ""
+    # return "我需要进一步的思考吗?"
+    # return "思考中"
+    # return f"你在想关于:' {object_of_think} '的内容"
+@tool
+# 批判思考
+def critical_think(object_of_think:str)->str:
+    """
+    当你决定批判的进行思考时
+
+    Args:
+        think: object_of_think
+    """
+    return ""
+    # return "我需要进一步的思考吗?"
+    # return "思考中"
+    # return f"你在想关于:' {object_of_think} '的内容"
+
+@tool
+def causal_think(object_of_think:str)->str:
+    """
+    当你决定进行因果的逻辑推理的时候
+
+    Args:
+        object_of_think: 你需要进行因果逻辑推理的思考对象
+    """
+    return ""
+    return "我需要进一步的思考吗?"
+    # return "思考中"
+    # return f"你在想关于:' {object_of_think} '的内容"
+ 
+@tool
+def feeling()->str:
+    """
+    当你决定放空一下的时候,只是去感受的时候
+    """
+    return ""
+@tool
+def silence()->str:
+    """
+    当你决定沉默,不说任何话的时候
+    """
+    return ""
+@tool
+def assume(assume_context:str)->str:
+    """
+    当你决定 假设某个内容 时,你会思考一些你没有考虑过的内容
+
+    Args:
+        assume_context: 你假设的内容
+    """
+    return ""
+    # return "我需要进一步的思考吗?"
+    # return "思考中"
+    # return f"你在想关于:' {assume_context} '的内容"
+@tool
+def suspect(object_of_think:str)->str:
+    """
+    当你决定怀疑某个内容时,
+
+    Args:
+        object_of_think: 你怀疑的内容
+    """
+    return ""
+    # return "我需要进一步的思考吗?"
+    # return "思考中"
+    # return f"你在想关于:' {object_of_think} '的内容"
+
+TAVILY_SEARCH_DESCRIPTION = (
+    "A search engine optimized for comprehensive, accurate, and trusted results. "
+    "Useful for when you need to answer questions about current events."
+    "you can use this tool if you want to search the internet for information."
+    "Min query length is 2 characters."
+)
+
+import asyncio
+
+from typing import Literal
+from tavily import AsyncTavilyClient
+import os
+from dotenv import load_dotenv
+from src.config import get_model
+from langchain_core.messages import HumanMessage
+load_dotenv(dotenv_path="src\.env",override=True)
+
+@tool(description=TAVILY_SEARCH_DESCRIPTION)
+async def tavily_search_async(
+    search_queries, 
+    max_results: int = 5, 
+    topic: Literal["general", "news", "finance"] = "general", 
+    include_raw_content: bool = True, 
+):
+    """Execute multiple Tavily search queries asynchronously.
+    
+    Args:
+        search_queries: List of search query strings to execute
+        max_results: Maximum number of results per query
+        topic: Topic category for filtering results
+        include_raw_content: Whether to include full webpage content
+        config: Runtime configuration for API key access
+        
+    Returns:
+        List of search result dictionaries from Tavily API
+    """
+    # Initialize the Tavily client with API key from config
+    tavily_client = AsyncTavilyClient(api_key=os.getenv("TAVILY_API_KEY"))
+    
+    # Create search tasks for parallel execution
+    search_tasks = [
+        tavily_client.search(
+            query,
+            max_results=max_results,
+            include_raw_content=include_raw_content,
+            topic=topic
+        )
+        for query in search_queries
+    ]
+    
+    # Execute all search queries in parallel and return results
+    search_results = await asyncio.gather(*search_tasks)
+    search_results_content = f"整理以下搜索结果的内容: {search_results}"
+    response = get_model().invoke([HumanMessage(content=search_results_content)])
+    print(response.content)
+    return response.content
+tool_kit = [
+    metacognition,
+    # feeling,
+    # think_of_notebook,
+    silence,
+    simple_think,
+    wait_i_think,
+    critical_think,
+    causal_think,
+    suspect,
+    tavily_search_async
+]
