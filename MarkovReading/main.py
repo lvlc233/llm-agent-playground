@@ -16,7 +16,10 @@ os.environ["LANGSMITH_API_KEY"] = os.getenv('LANGSMITH_API_KEY')
 os.environ["LANGSMITH_PROJECT"] = os.getenv('LANGSMITH_PROJECT')
 
 system_prompt = """
-正在阅读一篇长文，每次只能看到一小段。
+你在玩一个游戏,这个游戏中,你只能看到文章的一小段和上一个AI给你传递的印象,
+你需要根据你看到的信息整合为新的印象,传递给下一位AI,
+你们的目标是,使得最后的AI得到的消息能尽可能高度提取文章的内容而剔除无关的信息。
+在这个过程中,你们不会确定谁是最后一个AI
 
 
 你已有的印象是：
