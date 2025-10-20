@@ -1,2 +1,4 @@
-# llm-agent-playground
-A chaotic yet priceless idea storehouse.   It holds everything I’ve got on LLMs and Agents—random thoughts, rapid prototypes, experimental war stories, you name it.  
+# list
+think_king: 使用基础的思考工具+react模式,令基础模型具备可变思考能力,并涌现出各种思考模式 :完成基础,未来考虑迭代
+
+
