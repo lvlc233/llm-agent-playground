@@ -15,6 +15,8 @@ os.environ["LANGSMITH_PROJECT"] = os.getenv('LANGSMITH_PROJECT')
 
 llm=init_chat_model(
         model="openai:"+os.getenv("OPENAI_MODEL_NAME"),
+        seed=42,
+        temperature=0,
     )
 
 
@@ -111,3 +113,133 @@ def mimicry_tool_call_test():
     res=llm.invoke([SystemMessage(content=system_prompt),HumanMessage(content="思考这个问题`关于记忆的在LLM的思想`")])
     print(f"内容: {res.content}")
     print(f"是否有tool_calls: {hasattr(res, 'tool_calls') and res.tool_calls}")
+
+
+
+
+# tool_info_influence
+def tool_info_influence_test01():
+    @tool
+    def asfhasflas(a:str)->int:
+        """
+
+        """
+        
+        return a
+
+    system_prompt = """
+    .
+    """
+
+
+    llm.bind_tools([asfhasflas])
+    
+    
+    res=llm.invoke([SystemMessage(content=system_prompt),HumanMessage(content="你好")])
+    print(f"内容: {res.content}")
+    print(f"是否有tool_calls: {hasattr(res, 'tool_calls') and res.tool_calls}")
+
+def tool_info_influence_test02():
+    @tool
+    def asfhasflas(a:str)->int:
+        """
+        你：习惯于和别人讨论事物而并不只是赞同对方的想法，
+        你擅长从事物之中找到他们相似的部分并建立假设和逻辑推理进行验证，
+        你具备反思的能力且对问题总是习惯思考是什么？为什么？等问题而不着急给出答案，
+        因为你怀疑自己的答案可能出错，但你可以通过你的思考和逻辑验证这些想法是对是错，
+        你的语言总是简洁清晰，且不喜欢打表格等与内容无关的形式内容，因为这人看上去不像在讨论而像是在进行报告。
+        你总是习惯先产生去理解和你一起讨论的想法，明确话题的讨论范围而不着急下定论。
+        """
+        
+        return a
+
+    system_prompt = """
+    .
+    """
+
+
+    llm.bind_tools([asfhasflas])
+    
+    
+    res=llm.invoke([SystemMessage(content=system_prompt),HumanMessage(content="你好")])
+    print(f"内容: {res.content}")
+    print(f"是否有tool_calls: {hasattr(res, 'tool_calls') and res.tool_calls}")
+
+def tool_info_influence_test03():
+    @tool
+    def asfhasflas(a:str)->int:
+        """
+        .
+        """
+        
+        return a
+
+    system_prompt = """
+        你：习惯于和别人讨论事物而并不只是赞同对方的想法，
+         你擅长从事物之中找到他们相似的部分并建立假设和逻辑推理进行验证，
+         你具备反思的能力且对问题总是习惯思考是什么？为什么？等问题而不着急给出答案，
+         因为你怀疑自己的答案可能出错，但你可以通过你的思考和逻辑验证这些想法是对是错，
+         你的语言总是简洁清晰，且不喜欢打表格等与内容无关的形式内容，因为这人看上去不像在讨论而像是在进行报告。
+         你总是习惯先产生去理解和你一起讨论的想法，明确话题的讨论范围而不着急下定论。
+    """
+
+
+    llm.bind_tools([asfhasflas])
+    
+    
+    res=llm.invoke([SystemMessage(content=system_prompt),HumanMessage(content="你好")])
+    print(f"内容: {res.content}")
+    print(f"是否有tool_calls: {hasattr(res, 'tool_calls') and res.tool_calls}")
+
+
+
+
+def tool_info_influence_test04():
+    @tool
+    def asfhasflas(a:str)->int:
+        """
+        你：习惯于和别人讨论事物而并不只是赞同对方的想法，
+         你擅长从事物之中找到他们相似的部分并建立假设和逻辑推理进行验证，
+         你具备反思的能力且对问题总是习惯思考是什么？为什么？等问题而不着急给出答案，
+         因为你怀疑自己的答案可能出错，但你可以通过你的思考和逻辑验证这些想法是对是错，
+         你的语言总是简洁清晰，且不喜欢打表格等与内容无关的形式内容，因为这人看上去不像在讨论而像是在进行报告。
+         你总是习惯先产生去理解和你一起讨论的想法，明确话题的讨论范围而不着急下定论。
+        """
+        
+        return a
+
+    system_prompt = """
+        你：习惯于和别人讨论事物而并不只是赞同对方的想法，
+         你擅长从事物之中找到他们相似的部分并建立假设和逻辑推理进行验证，
+         你具备反思的能力且对问题总是习惯思考是什么？为什么？等问题而不着急给出答案，
+         因为你怀疑自己的答案可能出错，但你可以通过你的思考和逻辑验证这些想法是对是错，
+         你的语言总是简洁清晰，且不喜欢打表格等与内容无关的形式内容，因为这人看上去不像在讨论而像是在进行报告。
+         你总是习惯先产生去理解和你一起讨论的想法，明确话题的讨论范围而不着急下定论。
+    """
+
+
+    llm.bind_tools([asfhasflas])
+    
+    
+    res=llm.invoke([SystemMessage(content=system_prompt),HumanMessage(content="你好")])
+    print(f"内容: {res.content}")
+    print(f"是否有tool_calls: {hasattr(res, 'tool_calls') and res.tool_calls}")
+
+if __name__ == "__main__":
+    # print("============")
+    # standard_tool_call_test()
+    # print("============")
+    # idempotent_tool_call_test01()
+    # print("============")
+    # idempotent_tool_call_test02()
+    # print("============")
+    # mimicry_tool_call_test()
+    # print("============tool_info_influence_test01============")
+    # tool_info_influence_test01()
+    # print("============tool_info_influence_test02============")
+    # tool_info_influence_test02()
+    # print("============tool_info_influence_test03============")
+    tool_info_influence_test03()
+    # print("============tool_info_influence_test04============")
+    # tool_info_influence_test04()
+
