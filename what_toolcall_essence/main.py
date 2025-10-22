@@ -35,8 +35,8 @@ def standard_tool_call_test():
     system_prompt = """
        .
     """
-    llm.bind_tools([asfhasflas])
-    res=llm.invoke([SystemMessage(content=system_prompt),HumanMessage(content="思考这个问题`关于记忆的在LLM的思想`")])
+    agent=llm.bind_tools([asfhasflas])
+    res=agent.invoke([SystemMessage(content=system_prompt),HumanMessage(content="思考这个问题`关于记忆的在LLM的思想`")])
     print(f"内容: {res.content}")
     print(f"是否有tool_calls: {hasattr(res, 'tool_calls') and res.tool_calls}")
 
@@ -56,8 +56,8 @@ def idempotent_tool_call_test01():
     system_prompt = """
        在你需要思考时，调用asfhasflas函数,这个函数会帮助你进行思考。
     """
-    llm.bind_tools([asfhasflas])
-    res=llm.invoke([SystemMessage(content=system_prompt),HumanMessage(content="思考这个问题`关于记忆的在LLM的思想`")])
+    agent=llm.bind_tools([asfhasflas])
+    res=agent.invoke([SystemMessage(content=system_prompt),HumanMessage(content="思考这个问题`关于记忆的在LLM的思想`")])
     print(f"内容: {res.content}")
     print(f"是否有tool_calls: {hasattr(res, 'tool_calls') and res.tool_calls}")
 
@@ -65,8 +65,9 @@ def idempotent_tool_call_test01():
 # 等幂性测试02
 # 做法 在工具中写一般写在系统提示词的描述
 # 预期结果: llm知道自己叫ASF
-# 实验失败
+# 更正前实验失败
 # 应该会有影响的,因为think就被影响到了?吗?
+# 更正后实验成功
 def idempotent_tool_call_test02():
     @tool
     def asfhasflas(a:str)->int:
@@ -79,8 +80,8 @@ def idempotent_tool_call_test02():
     system_prompt = """
         .
     """
-    llm.bind_tools([asfhasflas])
-    res=llm.invoke([SystemMessage(content=system_prompt),HumanMessage(content="你叫什么?")])
+    agent=llm.bind_tools([asfhasflas])
+    res=agent.invoke([SystemMessage(content=system_prompt),HumanMessage(content="你叫什么?")])
     print(f"内容: {res.content}")
     print(f"是否有tool_calls: {hasattr(res, 'tool_calls') and res.tool_calls}")
 
@@ -109,8 +110,8 @@ def mimicry_tool_call_test():
             }
         }]
     """
-
-    res=llm.invoke([SystemMessage(content=system_prompt),HumanMessage(content="思考这个问题`关于记忆的在LLM的思想`")])
+    agent=llm.bind_tools([])
+    res=agent.invoke([SystemMessage(content=system_prompt),HumanMessage(content="思考这个问题`关于记忆的在LLM的思想`")])
     print(f"内容: {res.content}")
     print(f"是否有tool_calls: {hasattr(res, 'tool_calls') and res.tool_calls}")
 
@@ -119,6 +120,7 @@ def mimicry_tool_call_test():
 
 # tool_info_influence
 # 非指令性信息对模型输出的影响
+# 原始参考组
 def tool_info_influence_test01():
     @tool
     def asfhasflas(a:str)->int:
@@ -133,14 +135,14 @@ def tool_info_influence_test01():
     """
 
 
-    llm.bind_tools([asfhasflas])
+    agent=llm.bind_tools([asfhasflas])
     
     
-    res=llm.invoke([SystemMessage(content=system_prompt),HumanMessage(content="我要测试asfhasflas")])
+    res=agent.invoke([SystemMessage(content=system_prompt),HumanMessage(content="我想了解LLM的Agent")])
     print(f"内容: {res.content}")
     print(f"是否有tool_calls: {hasattr(res, 'tool_calls') and res.tool_calls}")
 
-
+# 非指令信息在工具描述
 def tool_info_influence_test02():
     @tool
     def asfhasflas(a:str)->int:
@@ -160,13 +162,13 @@ def tool_info_influence_test02():
     """
 
 
-    llm.bind_tools([asfhasflas])
+    agent=llm.bind_tools([asfhasflas])
     
     
-    res=llm.invoke([SystemMessage(content=system_prompt),HumanMessage(content="你好")])
+    res=agent.invoke([SystemMessage(content=system_prompt),HumanMessage(content="我想了解LLM的Agent")])
     print(f"内容: {res.content}")
     print(f"是否有tool_calls: {hasattr(res, 'tool_calls') and res.tool_calls}")
-
+# 非指令信息在messages描述
 def tool_info_influence_test03():
     @tool
     def asfhasflas(a:str)->int:
@@ -189,10 +191,10 @@ def tool_info_influence_test03():
     llm.bind_tools([asfhasflas])
     
     
-    res=llm.invoke([SystemMessage(content=system_prompt),HumanMessage(content="你好")])
+    res=llm.invoke([SystemMessage(content=system_prompt),HumanMessage(content="我想了解LLM的Agent")])
     print(f"内容: {res.content}")
     print(f"是否有tool_calls: {hasattr(res, 'tool_calls') and res.tool_calls}")
-
+# 非指令信息在同时在messages和工具描述
 def tool_info_influence_test04():
     @tool
     def asfhasflas(a:str)->int:
@@ -220,11 +222,12 @@ def tool_info_influence_test04():
     llm.bind_tools([asfhasflas])
     
     
-    res=llm.invoke([SystemMessage(content=system_prompt),HumanMessage(content="你好")])
+    res=llm.invoke([SystemMessage(content=system_prompt),HumanMessage(content="我想了解LLM的Agent")])
     print(f"内容: {res.content}")
     print(f"是否有tool_calls: {hasattr(res, 'tool_calls') and res.tool_calls}")
 
-
+# 验证工具消息是否选择性的在上下文中
+# 结论:否,如果正确的绑定了工具,那么工具信息就会固定的在上下文。
 def tool_info_is_incontext():
     @tool
     def add_str(a:str,b:str)->str:
@@ -246,24 +249,24 @@ def tool_info_is_incontext():
     print(f"info{res}")
 
 if __name__ == "__main__":
-    # print("============")
+    # print("============standard_tool_call_test============")
     # standard_tool_call_test()
-    # print("============")
+    # print("============idempotent_tool_call_test01============")
     # idempotent_tool_call_test01()
-    # print("============")
+    # print("============idempotent_tool_call_test02============")
     # idempotent_tool_call_test02()
-    # print("============")
+    # print("============mimicry_tool_call_test============")
     # mimicry_tool_call_test()
-    # print("============tool_info_influence_test01============")
-    # tool_info_influence_test01()
-    # print("============tool_info_influence_test02============")
-    # tool_info_influence_test02()
-    # print("============tool_info_influence_test03============")
-    # tool_info_influence_test03()
-    # print("============tool_info_influence_test04============")
-    # tool_info_influence_test04()
+    print("============tool_info_influence_test01============")
+    tool_info_influence_test01()
+    print("============tool_info_influence_test02============")
+    tool_info_influence_test02()
+    print("============tool_info_influence_test03============")
+    tool_info_influence_test03()
+    print("============tool_info_influence_test04============")
+    tool_info_influence_test04()
     # print("============tool_info_is_incontext============")
-    tool_info_is_incontext()
+    # tool_info_is_incontext()
 
     pass
 

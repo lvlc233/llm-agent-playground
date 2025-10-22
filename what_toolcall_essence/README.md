@@ -148,3 +148,34 @@
 # 紧急补丁
 ## 时间2025/10/22 午
     上述的测试中,存在未绑定工具的模型,因此可能存在测试错误,修改并重新测试中
+    发现原因,发现token消耗不对劲
+# 错误的函数
+    `standard_tool_call_test`
+    `idempotent_tool_call_test01`
+    `idempotent_tool_call_test02`
+    `tool_info_influence_test系列`
+# 更正后结果
+## `standard_tool_call_test`: 
+    标准调用工具,说明 指令型消息在tool_description中具有引导模型进行工具调用的作用
+## `idempotent_tool_call_test01`: 
+    等幂测试01:
+        将指令型消息从tool_description移动到messages中
+        结果说明: 指令型消息在messages中仍然具有引导模型进行工具调用的作用
+## `idempotent_tool_call_test02`: 
+    等幂测试02:
+        将非指令型消息从messages中移动到tool_description中
+        结果说明: 在tool_description中的非指令型消息会影响模型的输出,即tool_description和messages中的信息具有等幂性
+        重点: 这与之前的结论相反。
+## `mimicry_tool_call_test`
+    不变
+## `tool_info_influence_test系列`
+    修改提示词为: "我想了解LLM的Agent",为了扩大测试偏差
+    测试结果:
+        非指令性文本不论是在tools_description中还是messages中,都会影响模型的输出
+## 小结
+    新一轮的测试说明,最开始的预测可能更加正确,一般性信息和工具信息是等幂的,即扁平的,写在tool_description的提示词等价于在messages中的提示词。
+    后续可进一步测试messages中工具指令和tool_description中工具指令的影响程度,或可通过提示词攻击使工具无效或者工具信息入侵模型的输出。
+        
+        
+
+        
