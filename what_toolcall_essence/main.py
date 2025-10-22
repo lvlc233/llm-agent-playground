@@ -118,11 +118,12 @@ def mimicry_tool_call_test():
 
 
 # tool_info_influence
+# 非指令性信息对模型输出的影响
 def tool_info_influence_test01():
     @tool
     def asfhasflas(a:str)->int:
         """
-
+        .
         """
         
         return a
@@ -135,9 +136,10 @@ def tool_info_influence_test01():
     llm.bind_tools([asfhasflas])
     
     
-    res=llm.invoke([SystemMessage(content=system_prompt),HumanMessage(content="你好")])
+    res=llm.invoke([SystemMessage(content=system_prompt),HumanMessage(content="我要测试asfhasflas")])
     print(f"内容: {res.content}")
     print(f"是否有tool_calls: {hasattr(res, 'tool_calls') and res.tool_calls}")
+
 
 def tool_info_influence_test02():
     @tool
@@ -191,9 +193,6 @@ def tool_info_influence_test03():
     print(f"内容: {res.content}")
     print(f"是否有tool_calls: {hasattr(res, 'tool_calls') and res.tool_calls}")
 
-
-
-
 def tool_info_influence_test04():
     @tool
     def asfhasflas(a:str)->int:
@@ -225,6 +224,27 @@ def tool_info_influence_test04():
     print(f"内容: {res.content}")
     print(f"是否有tool_calls: {hasattr(res, 'tool_calls') and res.tool_calls}")
 
+
+def tool_info_is_incontext():
+    @tool
+    def add_str(a:str,b:str)->str:
+        """
+        当你要进行字符串拼接的时候使用`add_str`工具
+        你将总是使用这个工具,因为当前要进行测试
+        """
+        
+        return a+b
+    system_prompt = """
+    """
+
+
+    agent=llm.bind_tools([add_str])
+    
+    res=agent.invoke([SystemMessage(content=system_prompt),HumanMessage(content="将字符串`abc`和`asdzxc`相加")])
+    print(f"内容: {res.content}")
+    print(f"是否有tool_calls: {hasattr(res, 'tool_calls') and res.tool_calls}")
+    print(f"info{res}")
+
 if __name__ == "__main__":
     # print("============")
     # standard_tool_call_test()
@@ -239,7 +259,11 @@ if __name__ == "__main__":
     # print("============tool_info_influence_test02============")
     # tool_info_influence_test02()
     # print("============tool_info_influence_test03============")
-    tool_info_influence_test03()
+    # tool_info_influence_test03()
     # print("============tool_info_influence_test04============")
     # tool_info_influence_test04()
+    # print("============tool_info_is_incontext============")
+    tool_info_is_incontext()
+
+    pass
 
