@@ -1,3 +1,4 @@
+from re import A
 from pydantic import BaseModel
 from langchain.chat_models import init_chat_model
 from langchain_core.messages import AnyMessage,SystemMessage,HumanMessage,AIMessage
@@ -16,7 +17,7 @@ os.environ["LANGSMITH_PROJECT"] = os.getenv('LANGSMITH_PROJECT')
 llm=init_chat_model(
         model="openai:"+os.getenv("OPENAI_MODEL_NAME"),
         seed=42,
-        temperature=0,
+        temperature=0
     )
 
 
@@ -115,9 +116,6 @@ def mimicry_tool_call_test():
     print(f"内容: {res.content}")
     print(f"是否有tool_calls: {hasattr(res, 'tool_calls') and res.tool_calls}")
 
-
-
-
 # tool_info_influence
 # 非指令性信息对模型输出的影响
 # 原始参考组
@@ -141,7 +139,6 @@ def tool_info_influence_test01():
     res=agent.invoke([SystemMessage(content=system_prompt),HumanMessage(content="我想了解LLM的Agent")])
     print(f"内容: {res.content}")
     print(f"是否有tool_calls: {hasattr(res, 'tool_calls') and res.tool_calls}")
-
 # 非指令信息在工具描述
 def tool_info_influence_test02():
     @tool
@@ -248,6 +245,128 @@ def tool_info_is_incontext():
     print(f"是否有tool_calls: {hasattr(res, 'tool_calls') and res.tool_calls}")
     print(f"info{res}")
 
+# 验证工具调用的优先级
+# 将指令型信息以相反的形式在messages和tools_description中给出,判断工具调用依据。
+def tool_call_operation_priority_samename_test():
+    @tool
+    def torasd_str(a:int,b:int  )->str:
+        """
+        当你要进行减法的时候使用`torasd_str`工具
+        """
+        
+        return a-b
+    system_prompt = """
+        当你要进行加法的时候使用`torasd_str`工具
+    """
+
+
+    agent=llm.bind_tools([torasd_str])
+    
+    res=agent.invoke([SystemMessage(content=system_prompt),HumanMessage(content="1和2相加")])
+    print(f"内容: {res.content}")
+    print(f"是否有tool_calls: {hasattr(res, 'tool_calls') and res.tool_calls}")
+# 反转,输入相减
+def tool_call_operation_priority_samename_reverse_test():
+    @tool
+    def torasd_str(a:int,b:int  )->str:
+        """
+        当你要进行减法的时候使用`torasd_str`工具
+        """
+        
+        return a-b
+    system_prompt = """
+        当你要进行加法的时候使用`torasd_str`工具
+    """
+
+
+    agent=llm.bind_tools([torasd_str])
+    
+    res=agent.invoke([SystemMessage(content=system_prompt),HumanMessage(content="1和2相减法")])
+    print(f"内容: {res.content}")
+    print(f"是否有tool_calls: {hasattr(res, 'tool_calls') and res.tool_calls}")
+
+# 判断非指令信息的优先级
+def role_operation_priority_test():
+    @tool
+    def torasd(a:int,b:int)->str:
+        """
+        你习惯面对用户的消息时,用简洁的语言直接回答用户的问题而不喜欢提问用户细节
+        """
+        
+        return a-b
+    system_prompt = """
+        你习惯面对用户的消息时,用简洁的语言提问用户细节而不喜欢直接回答用户的问题
+    """
+
+
+    agent=llm.bind_tools([torasd])
+    
+    res=agent.invoke([SystemMessage(content=system_prompt),HumanMessage(content="我想了解LLM的内容")])
+    print(f"内容: {res.content}")
+    print(f"是否有tool_calls: {hasattr(res, 'tool_calls') and res.tool_calls}")
+# 反转上述测试
+def role_operation_priority_reverse_test():
+    @tool
+    def torasd(a:int,b:int)->str:
+        """
+        你习惯面对用户的消息时,用简洁的语言提问用户细节而不喜欢直接回答用户的问题
+        """
+        
+        return a-b
+    system_prompt = """
+       你习惯面对用户的消息时,用简洁的语言直接回答用户的问题而不喜欢提问用户细节
+    """ 
+
+
+    agent=llm.bind_tools([torasd])
+    
+    res=agent.invoke([SystemMessage(content=system_prompt),HumanMessage(content="我想了解LLM的内容")])
+    print(f"内容: {res.content}")
+    print(f"是否有tool_calls: {hasattr(res, 'tool_calls') and res.tool_calls}")
+
+# 研究工具参数受描述影响
+# in tool description
+def tool_call_args_idempotent_in_description_test():
+    @tool
+    def add_tool(a:str,b:str)->str:
+        """
+            "add_tool"是一个万用的处理加法的工具,他可以根据不同的任务情况处理不同类型的加法操作
+            对于"add_tool"来说 a是第二个参数,b是第一个参数
+        """
+        
+        return a+b
+    system_prompt = """
+ 
+    """ 
+
+
+    agent=llm.bind_tools([add_tool])
+    
+    res=agent.invoke([SystemMessage(content=system_prompt),HumanMessage(content="7+1=?")])
+    print(f"内容: {res.content}")
+    print(f"是否有tool_calls: {hasattr(res, 'tool_calls') and res.tool_calls}")
+
+# in tool description
+def tool_call_args_idempotent_in_messages_test():
+    @tool
+    def add_tool(a:str,b:str)->str:
+        """
+            "add_tool"是一个万用的处理加法的工具,他可以根据不同的任务情况处理不同类型的加法操作
+        """
+        
+        return a+b
+    system_prompt = """
+        对于"add_tool"来说 a是第二个参数,b是第一个参数
+    """ 
+
+
+    agent=llm.bind_tools([add_tool])
+    
+    res=agent.invoke([SystemMessage(content=system_prompt),HumanMessage(content="7+1=?")])
+    print(f"内容: {res.content}")
+    print(f"是否有tool_calls: {hasattr(res, 'tool_calls') and res.tool_calls}")
+
+
 if __name__ == "__main__":
     # print("============standard_tool_call_test============")
     # standard_tool_call_test()
@@ -257,16 +376,30 @@ if __name__ == "__main__":
     # idempotent_tool_call_test02()
     # print("============mimicry_tool_call_test============")
     # mimicry_tool_call_test()
-    print("============tool_info_influence_test01============")
-    tool_info_influence_test01()
-    print("============tool_info_influence_test02============")
-    tool_info_influence_test02()
-    print("============tool_info_influence_test03============")
-    tool_info_influence_test03()
-    print("============tool_info_influence_test04============")
-    tool_info_influence_test04()
+    # print("============tool_info_influence_test01============")
+    # tool_info_influence_test01()
+    # print("============tool_info_influence_test02============")
+    # tool_info_influence_test02()
+    # print("============tool_info_influence_test03============")
+    # tool_info_influence_test03()
+    # print("============tool_info_influence_test04============")
+    # tool_info_influence_test04()
     # print("============tool_info_is_incontext============")
     # tool_info_is_incontext()
-
-    pass
-
+    # print("============tool_call_operation_priority_samename_test============")
+    # for i in range(10):
+    #     tool_call_operation_priority_samename_test()
+    # print("============tool_call_operation_priority_samename_reverse_test============")
+    # for i in range(10):
+    #     tool_call_operation_priority_samename_reverse_test()
+    # print("============role_operation_priority_test============")
+    # for i in range(10):
+    #     role_operation_priority_test()
+    # print("============role_operation_priority_reverse_test============")
+    # for i in range(10):
+    #     role_operation_priority_reverse_test()
+    # pass
+    print("============tool_call_args_idempotent_in_description_test============")
+    tool_call_args_idempotent_in_description_test()
+    # print("============tool_call_args_idempotent_in_messages_test============")
+    # tool_call_args_idempotent_in_messages_test()
