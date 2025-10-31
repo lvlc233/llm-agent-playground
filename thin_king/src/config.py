@@ -17,12 +17,26 @@ def get_model():
     return init_chat_model(
         model="openai:"+os.getenv("OPENAI_MODEL_NAME"),
     ) 
+def get_model_think_v3_5():
+    return init_chat_model(
+        model="openai:"+os.getenv("OPENAI_MODEL_NAME"),
+    ) 
 
 def get_think_model(tools: List[BaseTool]):
     chat_model = init_chat_model(
-        model="openai:"+os.getenv("OPENAI_MODEL_NAME"),
+        model="openai:"+os.getenv("THINK_MODEL_NAME_V4"),
         
     ) 
 
     return chat_model.bind_tools(tools)
- 
+import logging
+
+# 配置日志
+logging.basicConfig(
+    level=logging.INFO,  # 设置日志级别
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',  # 日志格式
+    handlers=[
+        logging.FileHandler('app.log'),  # 输出到文件
+        logging.StreamHandler()          # 输出到控制台
+    ]
+)

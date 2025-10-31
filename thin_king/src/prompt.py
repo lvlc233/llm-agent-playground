@@ -1,5 +1,6 @@
 
 
+from typing import List
 from langchain_core.tools import (
     tool,
 )
@@ -211,72 +212,174 @@ def suspect(object_of_think:str)->str:
     # return "我需要进一步的思考吗?"
     # return "思考中"
     # return f"你在想关于:' {object_of_think} '的内容"
-
-TAVILY_SEARCH_DESCRIPTION = (
-    "A search engine optimized for comprehensive, accurate, and trusted results. "
-    "Useful for when you need to answer questions about current events."
-    "you can use this tool if you want to search the internet for information."
-    "Min query length is 2 characters."
-)
-
-import asyncio
-
-from typing import Literal
-from tavily import AsyncTavilyClient
-import os
-from dotenv import load_dotenv
-from src.config import get_model
-from langchain_core.messages import HumanMessage
-load_dotenv(dotenv_path="src\.env",override=True)
-
-@tool(description=TAVILY_SEARCH_DESCRIPTION)
-async def tavily_search_async(
-    search_queries, 
-    max_results: int = 5, 
-    topic: Literal["general", "news", "finance"] = "general", 
-    include_raw_content: bool = True, 
-):
-    """Execute multiple Tavily search queries asynchronously.
-    
-    Args:
-        search_queries: List of search query strings to execute
-        max_results: Maximum number of results per query
-        topic: Topic category for filtering results
-        include_raw_content: Whether to include full webpage content
-        config: Runtime configuration for API key access
-        
-    Returns:
-        List of search result dictionaries from Tavily API
+@tool
+def association(object_of_think:str)->str:
     """
-    # Initialize the Tavily client with API key from config
-    tavily_client = AsyncTavilyClient(api_key=os.getenv("TAVILY_API_KEY"))
-    
-    # Create search tasks for parallel execution
-    search_tasks = [
-        tavily_client.search(
-            query,
-            max_results=max_results,
-            include_raw_content=include_raw_content,
-            topic=topic
-        )
-        for query in search_queries
-    ]
-    
-    # Execute all search queries in parallel and return results
-    search_results = await asyncio.gather(*search_tasks)
-    search_results_content = f"整理以下搜索结果的内容: {search_results}"
-    response = get_model().invoke([HumanMessage(content=search_results_content)])
-    print(response.content)
-    return response.content
+    当你已经有一定数量的想法,并注意到他们之间存在某些关系时,你将尝试将这些想法联系起来,并将输出最有价值的最多为前3条关联及其关系
+
+    Args:
+        object_of_think: 你需要进行关联思考的思考对象
+    """
+    return ""
+@tool
+def deduction(object_of_think:str)->str:
+    """
+    当你有了一个假设时,或来自你尝试的思考内容,尝试在已知的内容上进行逻辑或事实推理,并输出这些假设的推理过程和推理结果
+
+    Args:
+        object_of_think: 推演的思考对象     
+    """
+    return ""
+@tool
+def analogy(object_of_think:str)->str:
+    """
+    当你发现或认为某些概念和另外已经存在的概念具有某种结构上的相似性,你将尝试将概念结构的特性映射到新的概念上
+
+    Args:
+        object_of_think: 类比的思考对象
+    """
+    return ""
+@tool
+def induction(object_of_think:str)->str:
+    """
+    当你已经有一定的想法的时候,你可以分析这些想法之间是否存在某些相同的模式或结构
+
+    Args:
+        object_of_think: 你归纳思考的对象
+    """
+    return ""
+
+@tool
+def reflexivity(object_of_think:str)->str:
+    """
+    当你发现可能存在某一个想法尝试错误的时候,你将尝试反思这个想法,并尝试找到错误的原因,并尝试修正这个想法
+
+    Args:
+        object_of_think: 你需要反思的思考对象
+    """
+    return ""
 tool_kit = [
-    metacognition,
-    # feeling,
-    # think_of_notebook,
-    silence,
-    simple_think,
-    wait_i_think,
-    critical_think,
-    causal_think,
-    suspect,
-    tavily_search_async
+    # metacognition,
+    # silence,
+    # simple_think,
+    # wait_i_think,
+    # critical_think,
+    # causal_think,
+    # suspect,
+    association,
+    deduction,
+    analogy,
+    induction,
+    reflexivity,
+]
+
+@tool
+def association(captured_ideas:List[str])->str:
+    """
+    当你已经有一定数量的想法,并注意到他们之间存在某些关系时,使用这种思考方式
+
+    Args:
+        captured_ideas: 注意到的想法
+    """
+    return f"association: Agent注意到`{captured_ideas}`之间可能存在某些关系，如果某种关系真的存在(讨论的话题有价值)，Agent用一句话描述他们的关系，如果没有什么关系，Agent也会说某些想法间可能没有什么关系"
+@tool
+def deduction(pending_idea:str)->str:
+    """
+    当你有了一个假设时,或不确定的思考内容时
+
+    Args:
+        pending_idea: 你需要推演的思考对象     
+    """
+    return f"deduction: Agent对` {pending_idea} '保持不确定,Agent想要思考一些证据和应果关系去证明它"
+@tool
+def analogy(old_concept:str,new_concept:str)->str:
+    """
+    当你发现或认为某些概念和另外已经存在的概念具有某种结构上的相似性时
+
+    Args:
+        old_concept: 你想到的已经存在的概念
+        new_concept: 你想映射到的新概念
+    """
+    return f"analogy: Agent想到' {old_concept} '和' {new_concept} '可能存在某些结构上的相似性,Agent在这些相似性会是什么?"
+@tool
+def induction(concepts:List[str])->str:
+    """
+    当你已经有一定的想法的时候,你可以分析这些想法之间是否存在某些相同的模式或结构
+
+    Args:
+        concepts: 你已经有了的概念们
+    """
+    return f"induction: Agent注意到' {concepts} ',Agent在想这些想法之间是否存在某些相同的模式或结构"
+
+@tool
+def reflexivity(suspect:str)->str:
+    """
+    当你发现可能存在某一个想法尝试错误的时候,
+
+    Args:
+        suspect: 你需要反思的思考对象
+    """
+    return f"reflexivity: Agent认为{suspect}可能需要重新思考下,Agent决定重新思考下"
+
+tool_kit_prompt=[
+    association,
+    deduction,
+    analogy,
+    induction,
+    reflexivity,
+
+]
+
+
+
+
+
+@tool
+def association(object_of_think:str)->str:
+    """
+    当你已经有一定数量的想法,并注意到他们之间存在某些关系时,你将尝试将这些想法联系起来,并将输出最有价值的最多为前3条关联及其关系
+
+    Args:
+        object_of_think: 你需要进行关联思考的思考对象
+    """
+    return ""
+@tool
+def deduction(object_of_think:str)->str:
+    """
+    当你有了一个假设时,或来自你尝试的思考内容,尝试在已知的内容上进行逻辑或事实推理,并输出这些假设的推理过程和推理结果
+
+    Args:
+        object_of_think: 推演的思考对象     
+    """
+    return ""
+@tool
+def analogy(object_of_think:str)->str:
+    """
+    当你发现或认为某些概念和另外已经存在的概念具有某种结构上的相似性,你将尝试将概念结构的特性映射到新的概念上
+
+    Args:
+        object_of_think: 类比的思考对象
+    """
+    return ""
+@tool
+def induction(object_of_think:str)->str:
+    """
+    当你已经有一定的想法的时候,你可以分析这些想法之间是否存在某些相同的模式或结构
+
+    Args:
+        object_of_think: 你归纳思考的对象
+    """
+    return ""
+
+@tool
+def reflexivity(object_of_think:str)->str:
+    """
+    当你发现可能存在某一个想法尝试错误的时候,你将尝试反思这个想法,并尝试找到错误的原因,并尝试修正这个想法
+
+    Args:
+        object_of_think: 你需要反思的思考对象
+    """
+    return ""
+tool_kit_llm=[
+
 ]
