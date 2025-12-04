@@ -1,0 +1,88 @@
+[project]
+name = "ToolCall_or_StructOutput"
+version = "0.0.1"
+description = "探索使用工具调用还是结构化输出的场所"
+authors = [
+    { name = "李孝在", email = "lxz233556@gmail.com" },
+]
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.11,<4.0"
+#urls = { Homepage = "https://github.com/webup/ufan_agent", Repository = "https://github.com/webup/ufan_agent", Issues = "https://github.com/webup/ufan_agent/issues", Releases = "https://github.com/webup/ufan_agent/releases" }
+dependencies = [
+    # Upgrade LangGraph core to 1.x
+    "langgraph>=1.0,<2.0",
+    # Upgrade LangChain core to 1.x; plugin packages keep existing ranges to avoid resolution failures
+    "langchain-openai>=0.1.22",
+    # Keep LangChain on 0.3.x to remain compatible with siliconflow and other plugins
+    "langchain>=1.1,<2.0",
+    "python-dotenv>=1.0.1",
+    "langchain-tavily>=0.1",
+    "pydantic>=2.0.0",
+    "pip>=25.3",
+]
+
+
+[project.optional-dependencies]
+dev = ["ipykernel>=6.29.5", "mypy>=1.11.1", "ruff>=0.6.1"]
+
+[build-system]
+requires = ["setuptools>=73.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["src"]
+[tool.setuptools.package-dir]
+"src" = "src"
+
+
+[tool.setuptools.package-data]
+"*" = ["py.typed"]
+
+[tool.ruff]
+lint.select = [
+    "E",    # pycodestyle
+    "F",    # pyflakes
+    "I",    # isort
+    "D",    # pydocstyle
+    "D401", # First line should be in imperative mood
+    "T201",
+    "UP",
+]
+lint.ignore = [
+    "UP006",
+    "UP007",
+    # We actually do want to import from typing_extensions
+    "UP035",
+    # Relax the convention by _not_ requiring documentation for every function parameter.
+    "D417",
+    "E501",
+]
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["D", "UP"]
+"tests/evaluations/*" = ["D", "UP", "T201"]  # Allow print statements in evaluation scripts
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+pythonpath = ["src"]
+
+[dependency-groups]
+dev = [
+    # Keep LangGraph CLI/SDK in 0.3.x family to match langgraph 1.x compatibility
+    "langgraph-cli[inmem]>=0.3,<1.0",
+    "pytest>=8.3.5",
+    "pytest-asyncio>=0.23.0",
+    "langgraph-sdk>=0.2.2,<0.3.0",
+    "mypy>=1.17.1",
+    "ruff>=0.9.10",
+    "openevals>=0.1.0",
+    "agentevals>=0.0.9",
+    "langsmith[pytest]>=0.4.16",
+    "pytest-xdist>=3.8.0",
+    "ipykernel>=6.29.5",
+]
