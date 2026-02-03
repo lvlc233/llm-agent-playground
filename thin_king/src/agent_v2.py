@@ -30,10 +30,6 @@ class State(BaseModel):
 # 这是一个枚举问题,llm中像是让LLM固定输出一个范围内的固定的若干个选项,即选择的最优解是什么呢?
 # 回答:就是结构化输出 
 
-
-
-
-
 class Command_t(BaseModel):
     command: Literal["think", "speak"] = Field(description="""如果你需要思考,则输出`think` 
                                                             若你决定表达观点给用户,则输出`speak`,

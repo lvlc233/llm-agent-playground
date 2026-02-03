@@ -1,2 +1,147 @@
-# thin_king
-This project explores the "cognitive" boundaries of large language models driven purely by prompts, possibly accompanied by some papers or reflections.
+# Thin_King: 思考型智能体实验平台
+
+一个基于LangGraph的思考型智能体实验平台，探索不同的思考架构和认知模式。
+
+## 项目概述
+
+Thin_King项目旨在研究和实验不同类型的思考架构，从简单的ReAct模式到复杂的网络化思考。每个版本都代表了一种独特的认知方法和思考模式。
+
+## 项目结构
+
+```
+thin_king/
+├── common/                 # 共享组件
+│   ├── config.py          # 模型配置
+│   ├── tools.py           # 思考工具集
+│   ├── prompts.py         # 提示模板
+│   └── utils.py           # 工具函数
+├── experiments/           # 实验版本
+│   ├── v1/               # 版本1: 基础ReAct
+│   ├── v2/               # 版本2: 元思考类型
+│   ├── v3/               # 版本3: 工具驱动思考
+│   ├── v4/               # 版本4: 记忆增强思考
+│   └── v5/               # 版本5: 网络化思考
+├── src/                  # 原始源码（已重构）
+└── main.py              # 主入口文件
+```
+
+## 实验版本
+
+### Version 1: 基础ReAct智能体
+- **特点**: 简单的推理-行动循环
+- **架构**: LLM调用 → 工具执行 → 状态管理
+- **适用**: 基础对话和简单任务
+
+### Version 2: 元思考类型
+- **特点**: 多种思考类型（联想、演绎、归纳、类比、反思）
+- **架构**: 命令构建 → 思考选择 → 思考执行 → 回应生成
+- **适用**: 需要不同思考方式的复杂问题
+
+### Version 3: 工具驱动思考
+- **特点**: 基于工具的迭代思考
+- **架构**: 主决策 → 思考生成 → 工具调用 → 循环
+- **适用**: 需要外部工具支持的任务
+
+### Version 4: 记忆增强思考
+- **特点**: 批量思考处理和记忆管理
+- **架构**: 结构化思考存储 → 批量处理 → 记忆更新
+- **适用**: 需要历史信息和上下文的长对话
+
+### Version 5: 网络化思考
+- **特点**: 基于邻接表的思考网络
+- **架构**: 思考节点 → 关系建立 → 网络遍历 → 价值评估
+- **适用**: 复杂推理和多维度思考
+
+## 快速开始
+
+### 安装依赖
+
+```bash
+pip install langchain langgraph langchain-core
+```
+
+### 配置环境
+
+1. 复制配置文件：
+```bash
+cp .env.example .env
+```
+
+2. 配置API密钥和模型设置
+
+### 运行实验
+
+```bash
+python main.py
+```
+
+这将依次测试所有版本的智能体。
+
+### 单独测试某个版本
+
+```python
+from experiments import graphv3
+
+response = await graphv3.ainvoke({
+    "messages": [{"role": "user", "content": "你的问题"}]
+})
+```
+
+## 核心组件
+
+### Common模块
+
+- **config.py**: 模型配置和API设置
+- **tools.py**: 思考工具集合（简单思考、元认知、批判思考等）
+- **prompts.py**: 系统提示模板
+- **utils.py**: 通用工具函数
+
+### 思考工具
+
+项目提供了多种思考工具：
+- `simple_think`: 简单思考
+- `metacognition`: 元认知
+- `critical_think`: 批判思考
+- `causal_think`: 因果推理
+- `wait_i_think`: 暂停思考
+- `suspect`: 怀疑
+- `assume`: 假设
+
+## 设计理念
+
+1. **模块化**: 每个版本独立，便于比较和实验
+2. **渐进式**: 从简单到复杂，逐步增加功能
+3. **可扩展**: 易于添加新的思考模式和工具
+4. **实验性**: 鼓励尝试不同的认知架构
+
+## 实验指南
+
+### 比较不同版本
+
+使用相同的问题测试不同版本，观察：
+- 思考过程的差异
+- 回答质量的变化
+- 处理复杂性的能力
+
+### 自定义实验
+
+1. 在`experiments/`下创建新版本目录
+2. 实现`agent.py`和相应的图结构
+3. 更新`experiments/__init__.py`
+4. 在`main.py`中添加测试
+
+## 贡献指南
+
+1. Fork项目
+2. 创建特性分支
+3. 实现新的思考架构
+4. 添加测试和文档
+5. 提交Pull Request
+
+## 许可证
+
+MIT License
+
+## 联系方式
+
+如有问题或建议，请提交Issue或联系项目维护者。

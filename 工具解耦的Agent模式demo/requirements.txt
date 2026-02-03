@@ -1,0 +1,29 @@
+# 状态驱动Agent模式Demo依赖
+
+# LangGraph核心依赖
+langgraph>=0.0.40
+langchain>=0.1.0
+langchain-core>=0.1.0
+langchain-openai>=0.0.5
+
+# 异步处理
+aiohttp>=3.8.0
+aiofiles>=23.0.0
+
+# 数据处理
+pydantic>=2.0.0
+
+# 开发和测试
+pytest>=7.0.0
+pytest-asyncio>=0.21.0
+
+# 可选：如果需要其他LLM提供商
+# langchain-anthropic
+# langchain-google-genai
+# langchain-huggingface
+
+# 环境变量管理
+python-dotenv>=1.0.0
+
+# 日志和监控
+rich>=13.0.0

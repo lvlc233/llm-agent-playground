@@ -74,6 +74,10 @@ class MetricsTracker:
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             filename = f"{self.experiment_name}_{timestamp}.csv"
 
+        # Sanitize filename to remove illegal characters
+        import re
+        filename = re.sub(r'[\\/*?:"<>|]', '_', filename)
+
         filepath = os.path.join(self.results_dir, filename)
 
         with open(filepath, 'w', newline='', encoding='utf-8') as csvfile:

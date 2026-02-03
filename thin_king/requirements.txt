@@ -1,0 +1,17 @@
+# Core dependencies
+langchain-core>=0.1.0
+langgraph>=0.1.0
+pydantic>=2.0.0
+
+# Model providers
+langchain-openai>=0.1.0
+
+# Environment management
+python-dotenv>=1.0.0
+
+# Development dependencies
+pytest>=7.0.0
+pytest-asyncio>=0.21.0
+
+# Optional: for enhanced logging
+structlog>=23.0.0
