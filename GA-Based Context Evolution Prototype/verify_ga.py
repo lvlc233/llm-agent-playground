@@ -12,7 +12,7 @@ from src.utils.monitor import StateMonitor
 async def main():
     load_dotenv()
     
-    target = "请写一段关于‘Rust语言内存安全机制’的简短介绍，要求通俗易懂，适合初学者，且包含‘所有权’和‘借用’两个概念。"
+    target = "帮我生成一个使用python进行快速原型开发Agent助手提示词。"
     
     print(f"目标: {target}\n")
     print("开始进化过程...\n")

@@ -130,11 +130,23 @@ def update_gene_pool_stats(
                 
                 # 更新突变率
                 # 分数越高 -> 突变率越低 (保留)
-                raw_rate = 1.0 - (avg_score / 100.0)
-                chunk.mutation_rate = max(min_rate, min(max_rate, raw_rate))
+                # 调整敏感度：让分数的微小变化能更显著地影响突变率
+                # 假设分数在 0-100 之间，我们希望 100 分 -> 0.05 突变率，0 分 -> 0.95 突变率
+                
+                # 归一化分数
+                normalized_score = avg_score / 100.0
+                
+                # 计算目标突变率：反比关系
+                target_rate = 1.0 - normalized_score
+                
+                # 平滑更新（移动平均），避免剧烈波动
+                # 新率 = 旧率 * 0.7 + 新目标 * 0.3
+                new_rate = chunk.mutation_rate * 0.7 + target_rate * 0.3
+                
+                chunk.mutation_rate = max(min_rate, min(max_rate, new_rate))
             else:
-                # 未使用的片段，保持原样或微调
-                pass
+                # 未使用的片段，稍微增加突变率，增加其被探索或被修改的可能性
+                chunk.mutation_rate = min(max_rate, chunk.mutation_rate * 1.05)
             
             updated_chunks.append(chunk)
         updated_pool[feature] = updated_chunks

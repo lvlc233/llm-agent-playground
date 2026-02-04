@@ -9,10 +9,10 @@ TARGET_PROFILING_PROMPT = ChatPromptTemplate.from_template(
     
     请输出一份为了完成该任务所需的理想上下文的特征信息,这些信息并不作为生成该任务的上下文,而是反向生成该任务目标完成所需要的可能元特征或者说该任务潜在的目标是什么?
     
-    请直接输出画像内容。
+    请直接输出最大数量为{max_profile}的特征 
     参考: 
     目标: 1+1=?
-    特征: 输出格式,输出长度,输出形式
+    特征: 输出结果约束,输出风格约束,输出长度约束
     """
 )
 
@@ -21,7 +21,7 @@ GENE_EXTRACTION_PROMPT = ChatPromptTemplate.from_template(
     """
     你的任务是针对:“理想上下文画像"中的特征描述:
     {ideal_context_profile}
-    
+    针对当前任务{target_description},
     对每个独立的特征,生成 {num_chunks} 个不同的“提示词指令(Prompt Instructions)”或“约束条件”。
     
     【关键要求】
@@ -61,8 +61,8 @@ REVERSE_PROFILING_PROMPT = ChatPromptTemplate.from_template(
     【生成内容】
     {generated_result}
 
-    请提取出该生成内容实际表现出的 3-5 个关键特征（例如：语气风格、格式结构、内容深度、是否包含代码等）。
-    请保持特征描述简练（例如：“包含代码示例”、“语气幽默”、“回答简短”）。
+    请提取出该生成内容实际表现出的 3-5 个关键特征。
+    请保持特征描述简练且具体（例如：“包含代码示例”、“语气幽默”、“回答简短”、“直接输出结果”）。
     """
 )
 
@@ -76,5 +76,22 @@ EVOLUTION_ANALYSIS_PROMPT = ChatPromptTemplate.from_template(
     平均分：{avg_score}
     
     请简要分析当前种群的多样性和收敛情况。
+    """
+)
+
+# 6. Gene Mutation (基因突变)
+GENE_MUTATION_PROMPT = ChatPromptTemplate.from_template(
+    """
+    你是一个基因编辑器。你的任务是对给定的“Prompt片段”进行微小的突变（修改）。
+    
+    【原始片段】
+    {original_content}
+    
+    【突变要求】
+    1. 保持原始片段的核心语义和功能不变。
+    2. 对措辞、语气或细节进行微调。例如：换一种更强烈的说法、更委婉的说法、或者精简/扩充描述。
+    3. 使得这个片段在表达上与原文有所区分，但目标一致。
+    
+    请直接输出突变后的内容，不要包含任何解释或引号。
     """
 )

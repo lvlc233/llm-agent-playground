@@ -3,7 +3,7 @@ from pydantic import BaseModel, Field
 
 class TargetFeature(BaseModel):
     """目标特征"""
-    features: List[str] = Field(description="目标特征列表")
+    features: List[str] = Field(description="目标特征的具体描述列表（例如：'包含代码示例'，而不是'代码'）")
 
 class ContextChunkList(BaseModel):
     """上下文块列表"""

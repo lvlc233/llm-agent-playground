@@ -17,9 +17,12 @@ class EvolutionConfig:
     initial_population_size: int = 5
     # 最大迭代次数
     max_generations: int = 5
+    # 最大槽位
+    max_profile:int =4
     # 突变概率
     min_mutation_rate: float = 0.05
     max_mutation_rate: float = 0.8
+
     # 迭代结束条件
     convergence_threshold: float = 95.0  # 如果分数 > 95 则停止
     
