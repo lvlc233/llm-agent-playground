@@ -131,6 +131,8 @@ def agent_node(state: AgentState) -> Dict[str, Any]:
             "messages": [response] # 这将AIMessage添加到历史记录中
         }
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         # API错误的回退
         return {
              "messages": [AIMessage(content=f"[错误: {str(e)}]")]
@@ -221,6 +223,8 @@ def judge_node(state: AgentState) -> Dict[str, Any]:
         return updates
 
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         return {"feedback": f"裁判错误：{str(e)}"}
 
 def should_continue(state: AgentState) -> Literal["perception", "end"]:
